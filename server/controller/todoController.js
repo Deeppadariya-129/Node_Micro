@@ -5,8 +5,11 @@ export const createTodo = async (req, res) => {
     try {
         const { title, description } = req.body
 
+        console.log("---------------------------->>" , title , description);
+        
+
         if (!title || !description) {
-            res.status(403).json({success:false ,  message:"All fields are required"})
+            return res.status(403).json({success:false ,  message:"All fields are required"})
         }
 
         const newTask = new Todo({ title, description })
@@ -37,7 +40,7 @@ export const getTotoById = async (req , res) => {
         const { id } = req.params
         
         if (!id) {
-            res.status(400).json({success:false ,  message:"Missing Todo ID"})
+            return res.status(400).json({success:false ,  message:"Missing Todo ID"})
         }
 
         const todoById = await Todo.findById(id);

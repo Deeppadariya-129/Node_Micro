@@ -5,15 +5,19 @@ import userRouter from './routes/userRoutes.js';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import todoRouter from './routes/todoRoutes.js';
+import cors from "cors";
+dotenv.config();
 
 
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(cors({ origin: process.env.FRONT_END_URL ,credentials: true }));
 app.use(bodyParser.json())
 app.use(express.json())
 app.use(cookieParser())
+
 
 connectDB()
 
