@@ -1,5 +1,6 @@
 import { User } from "../models/user.js"
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
 
 
@@ -24,8 +25,10 @@ export const register = async (req, res) => {
 
         const hashPassword = await bcrypt.hash(password, 10)
         await User.create({ email, fullname, password: hashPassword })
+
+
         
-        res.status(201).json({success:true , message:"User registration successfully"})
+        return res.status(201).json({success:true , message:"User registration successfully"})
 
     } catch (error) {
         res.status(500).json({ success: false, message: "Internal Server error" })
@@ -38,8 +41,6 @@ export const register = async (req, res) => {
 
 // ------------------------------------------------------------- Login --------------------------------------------------------
 export const login = async (req, res) => {
-    
-    console.log("----------------req" , req); 
 
     try {
 
@@ -61,8 +62,23 @@ export const login = async (req, res) => {
             res.status(403).json({success:false , message:"Incorrect Password"})
         }
 
-        res.status(201).json({success:true , message:"User login successfully"})
+        const token = await jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' })
+        
+
+        return res.status(201).cookie('token' , token , {HttpOnly:true , sameSite:"strict" , maxAge:24*60*60*1000}).json({success:true , message:"User login successfully"})
     
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Internal Server error" })
+        console.log(error);
+    }
+}
+
+
+export const logOut = async (req, res) => {
+    try {
+
+        res.status(200).cookie('token' , "" , {maxAge:0}).json({ success: true, message: "Logout Successfully" })
+
     } catch (error) {
         res.status(500).json({ success: false, message: "Internal Server error" })
         console.log(error);
